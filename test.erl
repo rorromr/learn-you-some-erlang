@@ -11,7 +11,12 @@
   right_age_if/1,
   help_me/1,
   insert/2,
-  nice_temperature/1
+  nice_temperature/1,
+  fac/1,
+  len/1,
+  duplicate/2,
+  zip/2,
+  zip_tail/2
 ]).
 
 % Get even numers
@@ -98,7 +103,24 @@ nice_temperature(Temperature) ->
       false
   end.
 
+fac(0) -> 1;
+fac(N) when N > 0 -> N*fac(N-1).
 
+% Tail recursive
+len(L) -> len(L,0).
+len([], Acc) -> Acc;
+len([_|T], Acc) -> len(T,Acc+1).
+
+duplicate(N, Term) -> duplicate_tail(N,Term,[]).
+duplicate_tail(0,_,L) -> L;
+duplicate_tail(N,Term,L) -> duplicate_tail(N-1,Term,[Term | L]).
+
+zip([],[]) -> [];
+zip([X|Rx],[Y|Ry]) -> [{X,Y}|zip(Rx,Ry)].
+
+zip_tail(X,Y) -> zip_tail(X,Y,[]).
+zip_tail([],[],Zip) -> Zip;
+zip_tail([X|Rx],[Y|Ry],Zip) -> zip_tail(Rx,Ry,[{X,Y}|Zip]).
 
 % Compile commands
 % cd(".").
