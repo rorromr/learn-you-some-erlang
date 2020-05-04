@@ -16,7 +16,14 @@
   len/1,
   duplicate/2,
   zip/2,
-  zip_tail/2
+  zip_tail/2,
+  map/2,
+  decr/1,
+  incr/1,
+  prepare_alarm/1,
+  filter/2,
+  fold/3,
+  reverse/1
 ]).
 
 % Get even numers
@@ -121,6 +128,83 @@ zip([X|Rx],[Y|Ry]) -> [{X,Y}|zip(Rx,Ry)].
 zip_tail(X,Y) -> zip_tail(X,Y,[]).
 zip_tail([],[],Zip) -> Zip;
 zip_tail([X|Rx],[Y|Ry],Zip) -> zip_tail(Rx,Ry,[{X,Y}|Zip]).
+
+% High order functions
+map(_, []) -> [];
+map(F, [H|T]) -> [F(H)|map(F,T)].
+
+incr_internal(X) -> X + 1.
+decr_internal(X) -> X - 1.
+
+incr(X) -> map(fun(A) -> A + 1  end, X).
+decr(X) -> map(fun(A) -> A - 1  end, X).
+
+% "named" anonymous funtions
+
+% This funtion will return Loop function that implement loop
+prepare_alarm(Room) ->
+  io:format("Alarm set in ~s.~n",[Room]),
+  fun Loop() ->
+     io:format("Alarm tripped in ~s! Call Batman!~n",[Room]),
+     timer:sleep(500),
+     Loop()
+  end.
+% AlarmReady = prepare_alarm("bathroom").
+% AlarmReady().
+
+% Apply a filter (Pred predicate) to a list
+filter(Pred, L) -> lists:reverse(filter(Pred, L, [])).
+
+filter(_, [], Acc) -> Acc;
+filter(Pred, [H|T], Acc) ->
+  case Pred(H) of
+    true -> filter(Pred, T, [H|Acc]);
+    false -> filter(Pred, T, Acc)
+  end.
+
+
+% Fold implementation, output it's single variable (Function to apply to element, Start value, List)
+fold(_, Start, []) -> Start;
+fold(F, Start, [H|T]) -> fold(F, F(H, Start), T).
+
+% Test with complete sum
+% test:fold(fun (A,B) when A > B -> A; (A,B) when A =< B -> B end, H, T).
+% test:fold(fun (A,B) when A > B -> A; (_,B) -> B end, H, T).
+% Get min
+% test:fold(fun (A,B) when A < B -> A; (_,B) -> B end, H, T).
+% Get complete sum
+% test:fold(fun (A,B) -> A + B end, 0, [H|T]).
+
+% Rerverse implementation with fold
+% Function to apply it's an add at top of the list resulting in reverse
+reverse(L) ->
+  fold(fun(X,Acc) -> [X|Acc] end, [], L).
+
+% reverse([1,2,3]) = fold(fun (X,Acc) -> [X|Acc] end, []               , [1,2,3])
+%                  = fold(fun (X,Acc) -> [X|Acc] end, [1|[]]   =[1]    , [2,3])
+%                  = fold(fun (X,Acc) -> [X|Acc] end, [2|1]    =[2,1]  , [3])
+%                  = fold(fun (X,Acc) -> [X|Acc] end, [3|[2,1]]=[3,2,1], [])
+%                  = [3,2,1]
+
+
+% Map implementation with fold
+map2(F,L) ->
+  reverse(fold(fun(X, Acc) -> [F(X)|Acc] end, [], L)).
+
+% Filter implementation with fold
+filter2(Pred, L) ->
+  F = fun(X, Acc) ->
+    case Pred(X) of
+      true -> [X|Acc];
+      false -> Acc
+    end
+  end,
+  reverse(fold(F,[],L)).
+
+
+
+
+
 
 % Compile commands
 % cd(".").
