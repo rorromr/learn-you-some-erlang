@@ -1,30 +1,5 @@
 -module(test).
--export([
-  even/1,
-  get_city_by_weather/1,
-  hello/0,
-  greet/2,
-  head/1,
-  to_isodate/1,
-  right_age/1,
-  wrong_age/1,
-  right_age_if/1,
-  help_me/1,
-  insert/2,
-  nice_temperature/1,
-  fac/1,
-  len/1,
-  duplicate/2,
-  zip/2,
-  zip_tail/2,
-  map/2,
-  decr/1,
-  incr/1,
-  prepare_alarm/1,
-  filter/2,
-  fold/3,
-  reverse/1
-]).
+-compile(export_all).
 
 % Get even numers
 even(L) ->
@@ -202,8 +177,30 @@ filter2(Pred, L) ->
   reverse(fold(F,[],L)).
 
 
+throws(F) ->
+  try F() of
+    _ -> ok
+  catch
+    Throw -> {throw, caught, Throw}
+  end.
 
+talk() -> "blah blah".
 
+sword(1) -> throw(slice);
+sword(2) -> erlang:error(cut_arm);
+sword(3) -> exit(cut_leg);
+sword(4) -> throw(punch);
+sword(5) -> exit(cross_bridge).
+
+black_knight(Attack) when is_function(Attack, 0) ->
+  try Attack() of
+    _ -> "None shall pass"
+  catch
+    throw:slice -> "it is but a scratch";
+    error:cut_arm -> "its had worse";
+    exit:cut_leg -> "come on you pansy";
+    _:_ -> "Just a flesh wound"
+  end.
 
 
 % Compile commands
