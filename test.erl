@@ -202,6 +202,32 @@ black_knight(Attack) when is_function(Attack, 0) ->
     _:_ -> "Just a flesh wound"
   end.
 
+% Reverse polish notation
+
+rpn(L) when is_list(L) ->
+  % Iterate over all values separated by space, apply fun rpn/2 with (Element, Acc), Acc starts at []
+  [Res] = lists:foldl(fun rpn/2, [], string:tokens(L," ")),
+  Res.
+
+% Numeric casts
+read(N) ->
+  % Check for float
+  case string:to_float(N) of
+    % Error during cast to float, try integer
+    {error,no_float} -> list_to_integer(N);
+    {F,_} -> F
+  end.
+
+% If +, operate with sum for first 2 elements and save result at stack
+rpn("+", [N1,N2|S]) -> [N2+N1|S];
+% If -, operate with susbtract for first 2 elements and save result at stack
+rpn("-", [N1,N2|S]) -> [N2-N1|S];
+% Then it's a number, cast and add to the stack as number
+rpn(X, Stack) -> [read(X)|Stack].
+
+
+
+
 
 % Compile commands
 % cd(".").
