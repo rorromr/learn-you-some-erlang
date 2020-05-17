@@ -226,6 +226,18 @@ rpn("-", [N1,N2|S]) -> [N2-N1|S];
 rpn(X, Stack) -> [read(X)|Stack].
 
 
+% Test with messages
+dolphin() ->
+  receive
+    {From, do_a_flip} ->
+      From ! "How about no?",
+      dolphin();
+    {From, fish} ->
+      From ! "Thanks for the fish, bye!";
+    _ ->
+      io:format("Unknown message!~n"),
+      dolphin()
+  end.
 
 
 
