@@ -1,6 +1,21 @@
 -module(test).
 -compile(export_all).
 
+-record(robot, 
+  { name,
+    type=industrial,
+    hobbies,
+    details=[]  
+  }).
+
+first_robot() ->
+  #robot{name="Mechatron",type=handmade,details=["Moved by a samll man inside"]}.
+
+robot_factory(#robot{name=Name,type=industrial}) ->
+  io:format("~p Instrial robot!~n",[Name]);
+robot_factory(#robot{name=Name}) ->
+  io:format("~p it's not allowed~n",[Name]).
+
 % Get even numers
 even(L) ->
   [2*N || N <- L].
