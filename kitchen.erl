@@ -24,6 +24,25 @@ fridge(FoodList) ->
             ok
     end.
 
+% Client interface
+start(FoodList) ->
+    spawn(?MODULE, fridge, [FoodList]).
+
+fridge_action(Pid, Action, Food) ->
+    Pid ! {self(),{Action, Food}},
+    receive
+        {Pid, Msg} ->
+            Msg
+    after 3000 ->
+        timeout
+    end.
+
+store(Pid, Food) ->
+    fridge_action(Pid, store, Food).
+
+take(Pid, Food) ->
+    fridge_action(Pid, take, Food).
+
 % c(kitchen).
 % Pid = spawn(kitchen,fridge,[[cocacola]]).
 % Pid ! {self(), {store, manjar}}.
